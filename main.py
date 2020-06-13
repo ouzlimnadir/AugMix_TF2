@@ -124,7 +124,6 @@ def main():
     else:
         config.save_dir_path = args["save_dir_path"]
 
-
     # get the data
     print("\nLoading data now.", end=" ")
     x_train, y_train, x_test, y_test, y_train_cat, y_test_cat = get_cifar_data()

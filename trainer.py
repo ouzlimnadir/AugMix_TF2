@@ -163,11 +163,11 @@ def train(training_data,
     # sanity check for epoch number. For example, if someone restored a checkpoint
     # from 15th epoch and want to train for two more epochs, then we need to explicitly
     # encode this logic in the for loop
-    if nb_epochs <= starting_epoch:
-        nb_epochs += starting_epoch
+    if cfg.num_epochs <= starting_epoch:
+        cfg.num_epochs += starting_epoch
     
     
-    for epoch in range(starting_epoch, nb_epochs):
+    for epoch in range(starting_epoch, cfg.num_epochs):
         pbar = Progbar(target=nb_train_steps, interval=0.5, width=30)
 
         # Train for an epoch and keep track of 
@@ -188,7 +188,7 @@ def train(training_data,
         # Validate after each epoch
         for bno in range(nb_test_steps):
             # Get the indices for the current batch
-            indices = test_indices[bno*batch_size:(bno + 1)*batch_size]
+            indices = test_indices[bno*cfg.batch_size:(bno + 1)*cfg.batch_size]
             
             # Get the data 
             images, labels = x_test[indices], y_test_cat[indices]
