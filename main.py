@@ -11,6 +11,9 @@ tf.get_logger().setLevel(logging.ERROR)
 from tensorflow.keras.utils import to_categorical
 from trainer import train
 
+import wandb
+wandb.login()
+
 ###########################################################################
 
 
@@ -62,6 +65,33 @@ def parse_args():
                         help="filename for the plots",
                         default="history.png",
                         required=False)
+
+    ## AUgMix params
+    parser.add_argument("--jsd_loss",
+                        type=bool,
+                        help="To use jsd loss",
+                        default=True,
+                        required=False)
+    parser.add_argument("--severity",
+                        type=int,
+                        help="Severity of underlying aug op",
+                        default=3,
+                        required=False)
+    parser.add_argument("--width",
+                        type=int,
+                        help="Width of aug chain",
+                        default=3,
+                        required=False)
+    parser.add_argument("--depth",
+                        type=int,
+                        help="Depth of aug chain. -1 or (1,3)",
+                        default=-1,
+                        required=False)
+    parser.add_argument("--alpha",
+                        type=float,
+                        help="Probability coeff for distributions",
+                        default=1.0,
+                        required=False)
     args = vars(parser.parse_args())
     return args
 
@@ -81,12 +111,18 @@ def main():
     config.num_epochs = args["epochs"]
     config.IMAGE_SIZE = args["img_size"]
     config.plot_name = args["plot_name"]
+    ## AugMix
+    config.jsd_loss = args["jsd_loss"]
+    config.severity = args["severity"]
+    config.width = args["width"]
+    config.depth = args["depth"]
+    config.alpha = args["alpha"]
+
     
     if args["save_dir_path"] == "":
         config.save_dir_path = './model_checkpoints'
     else:
         config.save_dir_path = args["save_dir_path"]
-        
 
 
     # get the data
@@ -98,16 +134,14 @@ def main():
 
     # pass the arguments to the trainer
     train(training_data=training_data,
-            validation_data=validation_data,
-            batch_size=config.batch_size, 
-            nb_epochs=config.num_epochs,
-            min_lr=config.min_lr,
-            max_lr=config.max_lr,
-            save_dir_path=config.save_dir_path)
+          validation_data=validation_data,
+          cfg = config)
     
 
 ###########################################################################  
 
 
 if __name__ == '__main__':
-      main()  
+
+    wandb.init(entity='authors', project='tfaugmentation')
+    main()

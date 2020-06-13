@@ -20,7 +20,9 @@ from models.resnet20 import resnet_v1
 from data_generator import DataGenerator
 from utils import CTLEarlyStopping, CTLHistory
 
-seed=1234
+import wandb
+
+seed=666
 np.random.seed(seed)
 tf.random.set_seed(seed)
 
@@ -113,12 +115,8 @@ def validate_step(images, labels):
 
 
 def train(training_data, 
-            validation_data, 
-            batch_size=32, 
-            nb_epochs=100,
-            min_lr=1e-5,
-            max_lr=1.0,
-            save_dir_path=""):
+          validation_data, 
+          cfg):
     
 
     x_train, y_train, y_train_cat = training_data
@@ -128,29 +126,29 @@ def train(training_data,
     # get the training data generator. We are not using validation generator because the 
     # data is already loaded in memory and we don't have to perform any extra operation 
     # apart from loading the validation images and validation labels.
-    ds = DataGenerator(x_train, y_train_cat, batch_size=batch_size)
+    ds = DataGenerator(x_train, y_train_cat, batch_size=cfg.batch_size)
     enqueuer = OrderedEnqueuer(ds, use_multiprocessing=True)
     enqueuer.start(workers=multiprocessing.cpu_count())
     train_ds = enqueuer.get()
 
     # get the total number of training and validation steps
-    nb_train_steps = int(np.ceil(len(x_train) / batch_size))
-    nb_test_steps = int(np.ceil(len(x_test) / batch_size))
+    nb_train_steps = int(np.ceil(len(x_train) / cfg.batch_size))
+    nb_test_steps = int(np.ceil(len(x_test) / cfg.batch_size))
     
     global total_steps
-    total_steps = nb_train_steps * config.num_epochs
+    total_steps = nb_train_steps * cfg.num_epochs
 
 
     # get the optimizer
     # SGD with cosine lr is causing NaNs. Need to investigate more
-    optim = optimizers.Adam(learning_rate=0.0001) 
+    optim = optimizers.Adam(learning_rate=0.001) 
                            
     
     # checkpoint prefix
-    checkpoint_prefix = os.path.join(save_dir_path, "ckpt")
+    checkpoint_prefix = os.path.join(cfg.save_dir_path, "ckpt")
     checkpoint = tf.train.Checkpoint(optimizer=optim, model=model)
     checkpoint_manager = tf.train.CheckpointManager(checkpoint, 
-                                                    directory=save_dir_path,
+                                                    directory=cfg.save_dir_path,
                                                     max_to_keep=10)
     
     # check for previous checkpoints, if any
@@ -219,6 +217,12 @@ def train(training_data,
                 train_loss: {loss:.6f}  train_acc: {acc*100:.2f}%  
                 test_loss:  {val_loss:.6f}  test_acc:  {val_acc*100:.2f}%\n""")
         
+        ## wandb logging
+        wandb.log({'Epoch': epoch, 
+            'train loss': loss, 
+            'train acc': acc,
+            'test loss': val_loss,
+            'test acc': val_acc})
         # get the model progress
         improved, stop_training = es.check_progress(val_loss)
         # check if performance of model has imporved or not
