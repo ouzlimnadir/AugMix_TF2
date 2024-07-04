@@ -69,8 +69,12 @@ def get_cifar_data():
     y_test = np.array(y_test)
 
     print(f"Loaded {x_train.shape} training images and {x_test.shape} test images.")
-    print(f"Loaded {y_train.shape} unique classes.")
-    print(f"Loaded {y_test.shape} unique classes.")
+    print(f"Loaded ytrain {y_train.shape}")
+    print(f"Loaded ytest  {y_test.shape}")
+
+    print("********************")
+    print("y_train 0 :", y_train[0])
+    print("y_test 0 :", y_test[0])
 
     y_train_cat = to_categorical(y_train)
     y_test_cat = to_categorical(y_test)
