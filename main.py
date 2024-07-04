@@ -107,7 +107,7 @@ def parse_args():
                         type=float)
     parser.add_argument('--img_size',
                         help='size of the images',
-                        default=32,
+                        default=224,
                         type=int)
     parser.add_argument("--save_dir_path",
                         type=str,
