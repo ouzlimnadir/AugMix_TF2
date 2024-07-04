@@ -64,16 +64,16 @@ def get_cifar_data():
 
     # Conversion des listes en tableaux numpy
     x_train = np.array(x_train)
-    y_train_cat = np.array(y_train)
+    y_train = np.array(y_train)
     x_test = np.array(x_test)
-    y_test_cat = np.array(y_test)
+    y_test = np.array(y_test)
 
     print(f"Loaded {x_train.shape} training images and {x_test.shape} test images.")
-    print(f"Loaded {y_train_cat.shape} unique classes.")
-    print(f"Loaded {y_test_cat.shape} unique classes.")
+    print(f"Loaded {y_train.shape} unique classes.")
+    print(f"Loaded {y_test.shape} unique classes.")
 
-    y_train = np.argmax(y_train, axis=1)
-    y_test = np.argmax(y_test, axis=1)
+    y_train_cat = to_categorical(y_train)
+    y_test_cat = to_categorical(y_test)
 
     print(f"y_train_cat shape: {y_train.shape}")
     print(f"y_test_cat shape: {y_test.shape}")
