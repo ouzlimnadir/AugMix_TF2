@@ -15,10 +15,10 @@ from trainer import train
 import wandb
 
 # extract the wandb api key from keys.txt
-with open("keys.txt", "r") as f:
-    api_key = f.readline().strip()
+# with open("keys.txt", "r") as f:
+#     api_key = f.readline().strip()
 
-wandb.login(key=api_key)
+wandb.login()
 
 ###########################################################################
 
