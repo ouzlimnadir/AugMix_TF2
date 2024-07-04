@@ -37,7 +37,8 @@ def get_cifar_data():
     y_test = []
 
     # Chargement des images d'entraînement
-    labels_set = set(os.listdir(dataset_path))
+    labels_set = sorted(os.listdir(dataset_path))
+    class_name = {CLASS_NAME: i for i, CLASS_NAME in enumerate(labels_set)}
 
     for label in labels_set:
         label_path = os.path.join(dataset_path, label)
@@ -47,7 +48,7 @@ def get_cifar_data():
                 image = cv2.imread(image_path)  # Charger l'image avec OpenCV
                 if image is not None:
                     x_train.append(image)
-                    y_train.append(label)
+                    y_train.append(class_name[label])
 
     # Chargement des images de test
     for image_name in os.listdir(test_path):
@@ -56,11 +57,11 @@ def get_cifar_data():
         if image is not None:
             # Utilisation du nom de l'image comme label
             label = image_name.split('.')[0]  # Enlever l'extension
-            if label in labels_set:
+            if label in class_name:
                 x_test.append(image)
-                y_test.append(label)
+                y_test.append(class_name[label])
             else:
-                print(f"Attention: Le label '{label}' pour l'image '{image_name}' not in training folder.")
+                print(f"Attention: Le label '{label}' pour l'image '{image_name}' n'est pas dans le dossier d'entraînement.")
 
     # Conversion des listes en tableaux numpy
     x_train = np.array(x_train)
@@ -76,11 +77,11 @@ def get_cifar_data():
     print("y_train 0 :", y_train[0])
     print("y_test 0 :", y_test[0])
 
-    y_train_cat = to_categorical(y_train)
-    y_test_cat = to_categorical(y_test)
+    y_train_cat = to_categorical(y_train, num_classes=len(labels_set))
+    y_test_cat = to_categorical(y_test, num_classes=len(labels_set))
 
-    print(f"y_train_cat shape: {y_train.shape}")
-    print(f"y_test_cat shape: {y_test.shape}")
+    print(f"y_train_cat shape: {y_train_cat.shape}")
+    print(f"y_test_cat shape: {y_test_cat.shape}")
 
     return x_train, y_train, x_test, y_test, y_train_cat, y_test_cat
 
