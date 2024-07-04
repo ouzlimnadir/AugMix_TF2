@@ -25,30 +25,69 @@ wandb.login()
 
 ###########################################################################
 
-def get_agriculture_crop_images_data():
+def get_cifar_data():
     """Loads agriculture crop images data"""
-    # Define the path to the dataset
-    dataset_path = os.path.join('C:\\Projects\\MyProject\\data', 'test_crop_image')
+    dataset_path = os.path.join('C:\\Projects\\MyProject\\data', 'crop_images')
+    test_path = os.path.join('C:\\Projects\\MyProject\\data', 'test_crop_images')
 
-    # Load an example image
-    image_path = os.path.join(dataset_path, 'example_image.jpg')
-    image = cv2.imread(image_path)
+    # Initialize lists to store data
+    x_train = []
+    y_train = []
+    x_test = []
+    y_test = []
+
+    # Function to load images from a directory
+    def load_images_from_dir(directory):
+        images = []
+        labels = []
+        label_map = {}  # To map label strings to numeric IDs
+
+        for root, _, files in os.walk(directory):
+            for file in files:
+                if file.endswith('.jpg') or file.endswith('.png'):  # Assuming images are jpg or png
+                    filepath = os.path.join(root, file)
+                    label = os.path.basename(root)  # Label is the name of the folder
+                    if label not in label_map:
+                        label_map[label] = len(label_map)
+
+                    # Read image using OpenCV
+                    image = cv2.imread(filepath)
+                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
+                    image = image.astype('float32') / 255.0  # Normalize pixel values
+                    # Resize image if needed
+                    # image = cv2.resize(image, (desired_width, desired_height))  # Uncomment and adjust as needed
+                    images.append(image)
+                    labels.append(label_map[label])
+
+        return images, labels
+
+    # Load training data
+    for class_folder in os.listdir(dataset_path):
+        class_path = os.path.join(dataset_path, class_folder)
+        if os.path.isdir(class_path):
+            images, labels = load_images_from_dir(class_path)
+            x_train.extend(images)
+            y_train.extend(labels)
+
+    # Load test data
+    test_images, test_labels = load_images_from_dir(test_path)
+    x_test.extend(test_images)
+    y_test.extend(test_labels)
+
+    # Convert lists to numpy arrays for easier manipulation (optional)
+    x_train = np.array(x_train)
+    y_train = np.array(y_train)
+    x_test = np.array(x_test)
+    y_test = np.array(y_test)
+
+    y_train_cat = np.argmax(y_train, axis=1)
+    y_test_cat = np.argmax(y_test, axis=1)
+
+    return x_train, y_train_cat, x_test, y_test_cat, y_train, y_test
 
 
-def get_cifar_data(num_classes=10):
-    """Loads cifar-10 data. Normalize the images and do one-hot encoding for labels"""
-
-    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
-    x_train = x_train.astype(np.float32) / 255.
-    x_test = x_test.astype(np.float32) / 255.
-
-    y_train_cat = to_categorical(y_train, num_classes=num_classes).astype(np.float32)
-    y_test_cat = to_categorical(y_test, num_classes=num_classes).astype(np.float32)
-
-    return x_train, y_train, x_test, y_test, y_train_cat, y_test_cat
 
 
-###########################################################################
 
 def parse_args():
     # Parse input arguments
