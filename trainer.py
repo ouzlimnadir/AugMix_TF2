@@ -31,7 +31,7 @@ tf.random.set_seed(seed)
 
 # get the model instance
 print("\nLoading model")
-model = resnet_v1(input_shape=(32, 32, 3), num_classes=10)
+model = resnet_v1(input_shape=(224, 224, 3), num_classes=5, depth=20)
 model.summary()
 print("")
 
