@@ -3,6 +3,7 @@ import argparse
 import logging
 import numpy as np
 import config
+import cv2
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2" 
 import tensorflow as tf
@@ -12,9 +13,23 @@ from tensorflow.keras.utils import to_categorical
 from trainer import train
 
 import wandb
-wandb.login()
+
+# extract the wandb api key from keys.txt
+with open("keys.txt", "r") as f:
+    api_key = f.readline().strip()
+
+wandb.login(key=api_key)
 
 ###########################################################################
+
+def get_agriculture_crop_images_data():
+    """Loads agriculture crop images data"""
+    # Define the path to the dataset
+    dataset_path = os.path.join('C:\\Projects\\MyProject\\data', 'test_crop_image')
+
+    # Load an example image
+    image_path = os.path.join(dataset_path, 'example_image.jpg')
+    image = cv2.imread(image_path)
 
 
 def get_cifar_data(num_classes=10):
