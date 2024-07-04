@@ -80,8 +80,16 @@ def get_cifar_data():
     x_test = np.array(x_test)
     y_test = np.array(y_test)
 
+    print(f"Loaded {x_train.shape} training images and {x_test.shape} test images.")
+    print(f"Loaded {y_train.shape} unique classes.")
+    print(f"Loaded {y_test.shape} unique classes.")
+
     y_train_cat = np.argmax(y_train, axis=1)
     y_test_cat = np.argmax(y_test, axis=1)
+
+    print(f"y_train_cat shape: {y_train_cat.shape}")
+    print(f"y_test_cat shape: {y_test_cat.shape}")
+
 
     return x_train, y_train_cat, x_test, y_test_cat, y_train, y_test
 
