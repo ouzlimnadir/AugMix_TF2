@@ -5,7 +5,7 @@ import numpy as np
 import config
 import cv2
 
-entity = "medbaka74-university"
+entity = "um6p2024"
 project = "DAv1"
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2" 
