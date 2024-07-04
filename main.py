@@ -5,6 +5,9 @@ import numpy as np
 import config
 import cv2
 
+entity = "medbaka74-university"
+project = "DAv1"
+
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2" 
 import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
@@ -157,5 +160,5 @@ def main():
 
 if __name__ == '__main__':
 
-    wandb.init(entity='authors', project='tfaugmentation')
+    wandb.init(entity=entity, project=project)
     main()
