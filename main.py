@@ -25,76 +25,57 @@ wandb.login()
 
 ###########################################################################
 
-def get_cifar_data():
-    """Loads agriculture crop images data"""
-    dataset_path = os.path.join('data', 'crop_images')
-    test_path = os.path.join('data', 'test_crop_images')
 
-    # Initialize lists to store data
+def get_cifar_data():
+    # Initialisation des listes pour stocker les données
     x_train = []
     y_train = []
     x_test = []
     y_test = []
 
-    # Function to load images from a directory
-    def load_images_from_dir(directory):
-        images = []
-        labels = []
-        label_map = {}  # To map label strings to numeric IDs
+    # Chargement des images d'entraînement
+    labels_set = set(os.listdir(dataset_path))
 
-        for root, _, files in os.walk(directory):
-            for file in files:
-                if file.endswith('.jpg') or file.endswith('.png'):  # Assuming images are jpg or png
-                    filepath = os.path.join(root, file)
-                    label = os.path.basename(root)  # Label is the name of the folder
-                    if label not in label_map:
-                        label_map[label] = len(label_map)
+    for label in labels_set:
+        label_path = os.path.join(dataset_path, label)
+        if os.path.isdir(label_path):
+            for image_name in os.listdir(label_path):
+                image_path = os.path.join(label_path, image_name)
+                image = cv2.imread(image_path)  # Charger l'image avec OpenCV
+                if image is not None:
+                    x_train.append(image)
+                    y_train.append(label)
 
-                    # Read image using OpenCV
-                    image = cv2.imread(filepath)
-                    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
-                    image = image.astype('float32') / 255.0  # Normalize pixel values
-                    # Resize image if needed
-                    # image = cv2.resize(image, (desired_width, desired_height))  # Uncomment and adjust as needed
-                    images.append(image)
-                    labels.append(label_map[label])
+    # Chargement des images de test
+    for image_name in os.listdir(test_path):
+        image_path = os.path.join(test_path, image_name)
+        image = cv2.imread(image_path)  # Charger l'image avec OpenCV
+        if image is not None:
+            # Utilisation du nom de l'image comme label
+            label = image_name.split('.')[0]  # Enlever l'extension
+            if label in labels_set:
+                x_test.append(image)
+                y_test.append(label)
+            else:
+                print(f"Attention: Le label '{label}' pour l'image '{image_name}' not in training folder.")
 
-        return images, labels
-
-    # Load training data
-    for class_folder in os.listdir(dataset_path):
-        class_path = os.path.join(dataset_path, class_folder)
-        if os.path.isdir(class_path):
-            images, labels = load_images_from_dir(class_path)
-            x_train.extend(images)
-            y_train.extend(labels)
-
-    # Load test data
-    test_images, test_labels = load_images_from_dir(test_path)
-    x_test.extend(test_images)
-    y_test.extend(test_labels)
-
-    # Convert lists to numpy arrays for easier manipulation (optional)
+    # Conversion des listes en tableaux numpy
     x_train = np.array(x_train)
-    y_train = np.array(y_train)
+    y_train_cat = np.array(y_train)
     x_test = np.array(x_test)
-    y_test = np.array(y_test)
+    y_test_cat = np.array(y_test)
 
     print(f"Loaded {x_train.shape} training images and {x_test.shape} test images.")
-    print(f"Loaded {y_train.shape} unique classes.")
-    print(f"Loaded {y_test.shape} unique classes.")
+    print(f"Loaded {y_train_cat.shape} unique classes.")
+    print(f"Loaded {y_test_cat.shape} unique classes.")
 
-    y_train_cat = np.argmax(y_train, axis=1)
-    y_test_cat = np.argmax(y_test, axis=1)
+    y_train = np.argmax(y_train, axis=1)
+    y_test = np.argmax(y_test, axis=1)
 
-    print(f"y_train_cat shape: {y_train_cat.shape}")
-    print(f"y_test_cat shape: {y_test_cat.shape}")
+    print(f"y_train_cat shape: {y_train.shape}")
+    print(f"y_test_cat shape: {y_test.shape}")
 
-
-    return x_train, y_train_cat, x_test, y_test_cat, y_train, y_test
-
-
-
+    return x_train, y_train, x_test, y_test, y_train_cat, y_test_cat
 
 
 def parse_args():
@@ -162,6 +143,7 @@ def parse_args():
 
 ###########################################################################
 
+
 def main():
     args = parse_args()
     print('\nCalled with args:')
@@ -183,7 +165,6 @@ def main():
     config.depth = args["depth"]
     config.alpha = args["alpha"]
 
-    
     if args["save_dir_path"] == "":
         config.save_dir_path = './model_checkpoints'
     else:
