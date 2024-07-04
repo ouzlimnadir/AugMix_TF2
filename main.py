@@ -27,8 +27,8 @@ wandb.login()
 
 def get_cifar_data():
     """Loads agriculture crop images data"""
-    dataset_path = os.path.join('C:\\Projects\\MyProject\\data', 'crop_images')
-    test_path = os.path.join('C:\\Projects\\MyProject\\data', 'test_crop_images')
+    dataset_path = os.path.join('data', 'crop_images')
+    test_path = os.path.join('data', 'test_crop_images')
 
     # Initialize lists to store data
     x_train = []
