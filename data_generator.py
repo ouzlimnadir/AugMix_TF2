@@ -16,7 +16,7 @@ class DataGenerator(Sequence):
     def __init__(self, 
                  data, 
                  labels,
-                 img_dim=(32, 32,3), 
+                 img_dim=(224, 224,3),
                  batch_size=32, 
                  num_classes=10, 
                  shuffle=True,
