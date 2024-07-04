@@ -27,6 +27,9 @@ wandb.login()
 
 
 def get_cifar_data():
+    dataset_path = os.path.join('data', 'crop_images')
+    test_path = os.path.join('data', 'test_crop_images')
+
     # Initialisation des listes pour stocker les données
     x_train = []
     y_train = []
