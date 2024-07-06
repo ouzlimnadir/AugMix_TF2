@@ -27,12 +27,12 @@ wandb.login()
 
 ###########################################################################
 # Préfixes à utiliser pour extraire les labels
-prefixes = ['sugarcane', 'wheat', 'jute', 'rice', 'maize']
+CLASS_NAME = ['sugarcane', 'wheat', 'jute', 'rice', 'maize']
 
 
 # Fonction pour extraire le label à partir du nom de fichier
 def extract_label(filename):
-    for prefix in prefixes:
+    for prefix in CLASS_NAME:
         if filename.startswith(prefix):
             return prefix
     return None
@@ -50,6 +50,7 @@ def get_cifar_data():
     # Chargement des images d'entraînement
     labels_set = sorted(os.listdir(dataset_path))
     class_name = {CLASS_NAME: i for i, CLASS_NAME in enumerate(labels_set)}
+    print("class_name: ", class_name)
 
     for label in labels_set:
         label_path = os.path.join(dataset_path, label)
@@ -59,7 +60,7 @@ def get_cifar_data():
                 image = cv2.imread(image_path)  # Charger l'image avec OpenCV
                 if image is not None:
                     x_train.append(image)
-                    y_train.append(class_name[label])
+                    y_train.append(label)
 
     # Parcourir les fichiers dans le dossier de test
     for filename in os.listdir(test_path):
@@ -83,6 +84,7 @@ def get_cifar_data():
 
     # Encoder
     label_encoder = LabelEncoder()
+    y_train = label_encoder.fit_transform(y_train)
     y_test = label_encoder.fit_transform(y_test)
 
     print(f"Loaded {x_train.shape} training images and {x_test.shape} test images.")
