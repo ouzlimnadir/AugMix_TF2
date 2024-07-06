@@ -15,6 +15,7 @@ tf.get_logger().setLevel(logging.ERROR)
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from trainer import train
+from sklearn.preprocessing import LabelEncoder
 
 import wandb
 
@@ -79,6 +80,10 @@ def get_cifar_data():
     y_train = np.array(y_train)
     x_test = np.array(x_test)
     y_test = np.array(y_test)
+
+    # Encoder
+    label_encoder = LabelEncoder()
+    y_test = label_encoder.fit_transform(y_test)
 
     print(f"Loaded {x_train.shape} training images and {x_test.shape} test images.")
     print(f"Loaded ytrain {y_train.shape}")
