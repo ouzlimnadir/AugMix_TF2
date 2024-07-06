@@ -57,7 +57,7 @@ def get_cifar_data():
         if image is not None:
             # Utilisation du nom de l'image comme label
             label = image_name.split('.')[0]  # Enlever l'extension
-            if label in class_name:
+            if any(name in label for name in class_name):
                 x_test.append(image)
                 y_test.append(class_name[label])
             else:
