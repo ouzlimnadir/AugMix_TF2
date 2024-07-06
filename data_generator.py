@@ -18,7 +18,7 @@ class DataGenerator(Sequence):
                  labels,
                  img_dim=(224, 224,3),
                  batch_size=32, 
-                 num_classes=10, 
+                 num_classes=5,
                  shuffle=True,
                  jsd=True
                 ):
