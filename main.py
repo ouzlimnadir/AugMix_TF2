@@ -13,6 +13,7 @@ import tensorflow as tf
 tf.get_logger().setLevel(logging.ERROR)
 
 from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array
 from trainer import train
 
 import wandb
@@ -24,7 +25,16 @@ import wandb
 wandb.login()
 
 ###########################################################################
+# Préfixes à utiliser pour extraire les labels
+prefixes = ['sugarcane', 'wheat', 'jute', 'rice', 'maize']
 
+
+# Fonction pour extraire le label à partir du nom de fichier
+def extract_label(filename):
+    for prefix in prefixes:
+        if filename.startswith(prefix):
+            return prefix
+    return None
 
 def get_cifar_data():
     dataset_path = os.path.join('data', 'crop_images')
@@ -50,18 +60,19 @@ def get_cifar_data():
                     x_train.append(image)
                     y_train.append(class_name[label])
 
-    # Chargement des images de test
-    for image_name in os.listdir(test_path):
-        image_path = os.path.join(test_path, image_name)
-        image = cv2.imread(image_path)  # Charger l'image avec OpenCV
-        if image is not None:
-            # Utilisation du nom de l'image comme label
-            label = image_name.split('.')[0]  # Enlever l'extension
-            if any(name in label for name in class_name):
-                x_test.append(image)
-                y_test.append(class_name[label])
-            else:
-                print(f"Attention: Le label '{label}' pour l'image '{image_name}' n'est pas dans le dossier d'entraînement.")
+    # Parcourir les fichiers dans le dossier de test
+    for filename in os.listdir(test_path):
+        label = extract_label(filename)
+        if label is not None:
+            # Charger l'image
+            img_path = os.path.join(test_path, filename)
+            img = load_img(img_path, target_size=(224, 224))
+            img_array = img_to_array(img)
+
+            # Ajouter l'image et le label aux listes
+            x_test.append(img_array)
+            y_test.append(label)
+
 
     # Conversion des listes en tableaux numpy
     x_train = np.array(x_train)
