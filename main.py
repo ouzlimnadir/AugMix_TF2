@@ -214,5 +214,5 @@ def main():
 
 if __name__ == '__main__':
 
-    wandb.init(entity=entity, project=project)
+    wandb.init(entity=entity, project=project, name='AugMix')
     main()
