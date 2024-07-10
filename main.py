@@ -6,7 +6,7 @@ import config
 import cv2
 
 entity = "um6p2024"
-project = "DAv1"
+project = "final_DA"
 
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "2" 
 import tensorflow as tf
